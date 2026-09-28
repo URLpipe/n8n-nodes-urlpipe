@@ -1,0 +1,62 @@
+{
+	"name": "n8n-nodes-urlpipe",
+	"version": "0.1.0",
+	"description": "n8n node for URLpipe: turn any URL into Markdown, a screenshot, metadata, console errors or a Lighthouse audit, rendered in real Chrome.",
+	"license": "MIT",
+	"homepage": "https://urlpipe.dev/integrations/n8n",
+	"keywords": [
+		"n8n-community-node-package",
+		"n8n",
+		"urlpipe",
+		"markdown",
+		"screenshot",
+		"web-scraping",
+		"lighthouse",
+		"metadata"
+	],
+	"author": {
+		"name": "URLpipe",
+		"email": "contact@urlpipe.dev"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/URLpipe/n8n-nodes-urlpipe.git"
+	},
+	"bugs": {
+		"url": "https://github.com/URLpipe/n8n-nodes-urlpipe/issues"
+	},
+	"scripts": {
+		"build": "n8n-node build",
+		"build:watch": "tsc --watch",
+		"dev": "n8n-node dev",
+		"lint": "n8n-node lint",
+		"lint:fix": "n8n-node lint --fix",
+		"test": "n8n-node build && node --test \"test/*.test.js\"",
+		"release": "n8n-node release",
+		"prepublishOnly": "n8n-node prerelease"
+	},
+	"files": [
+		"dist",
+		"!dist/tsconfig.tsbuildinfo"
+	],
+	"n8n": {
+		"n8nNodesApiVersion": 1,
+		"strict": true,
+		"credentials": [
+			"dist/credentials/UrlpipeApi.credentials.js"
+		],
+		"nodes": [
+			"dist/nodes/Urlpipe/Urlpipe.node.js"
+		]
+	},
+	"devDependencies": {
+		"@n8n/node-cli": "*",
+		"eslint": "9.32.0",
+		"prettier": "3.6.2",
+		"release-it": "^19.0.4",
+		"typescript": "5.9.2"
+	},
+	"peerDependencies": {
+		"n8n-workflow": "*"
+	}
+}
