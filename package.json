@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-urlpipe",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "n8n node for URLpipe: turn any URL into Markdown, a screenshot, metadata, console errors or a Lighthouse audit, rendered in real Chrome.",
 	"license": "MIT",
 	"homepage": "https://urlpipe.dev/integrations/n8n",

@@ -3,7 +3,7 @@ export const BASE_URL = 'https://urlpipe.dev';
 export const CREDENTIAL_NAME = 'urlpipeApi';
 
 // Kept in step with package.json; a test checks that they match.
-export const PACKAGE_VERSION = '0.1.0';
+export const PACKAGE_VERSION = '0.1.1';
 
 export const USER_AGENT = `n8n-nodes-urlpipe/${PACKAGE_VERSION}`;
 
