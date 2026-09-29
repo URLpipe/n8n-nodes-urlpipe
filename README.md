@@ -35,7 +35,7 @@ Every operation except Get Result takes the page's **URL**. Each input item is o
 
 | Operation | What you get | Credits |
 | --- | --- | --- |
-| **Get Markdown** | The page's main content as Markdown, without navigation, sidebars or cookie banners: `{url, markdown, token, cache, credits}`. The format LLMs and RAG pipelines work best with. | 1 |
+| **Get Markdown** | The page's main content as Markdown, without navigation, sidebars or cookie banners: `{url, markdown, token, finalUrl, cache, credits}`. The format LLMs and RAG pipelines work best with. | 1 |
 | **Get Rendered HTML** | The HTML after the page's JavaScript has run: `{url, html, …}` | 1 |
 | **Get Summary** | An AI summary of the page, as Markdown: `{url, summary, …}` | 17 |
 | **Take Screenshot** | The image as n8n binary data (field `data` by default, named after the host, such as `example.com.png`), plus `{url, resultUrl, mimeType, …}`. `resultUrl` is a link to the image that needs no API key and works for 30 days. | 1 |
@@ -46,7 +46,7 @@ Every operation except Get Result takes the page's **URL**. Each input item is o
 | **Scrape** | Several of the above off one page visit: pick them under **Operations**. You get `{url, operations: {<name>: {success, result, error, cached}}}`; a screenshot among them goes to binary data. Each operation is billed as it would be on its own, but you get them all much sooner. | sum |
 | **Get Result** | The result of an earlier request, by its **Token**. Set **Original Operation** to shape it like that operation (a screenshot as a file, for example), and **Wait Until Ready** to keep checking until it is done. | 0 |
 
-Every output carries `token` (fetch the same result again, free, for 30 days), `cache` (`hit` when it came from the cache and cost nothing) and `credits` (what the call cost).
+Every output carries `token` (fetch the same result again, free, for 30 days), `finalUrl` (where the page ended up, after its redirects), `cache` (`hit` when it came from the cache and cost nothing) and `credits` (what the call cost).
 
 Take Screenshot and Scrape also take **Screenshot Options**: Full Page, Viewport Width, Viewport Height, Scale (1x to 3x), Format (PNG, JPEG or WebP), Quality, Dark Mode and Element Selector (capture one element instead of the page).
 

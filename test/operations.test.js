@@ -15,7 +15,13 @@ const page = (operation, extra = {}) => ({
 test('Get Markdown posts the URL synchronously and outputs the text with the request facts', async () => {
 	const { output, requests } = await run({
 		params: page('markdown'),
-		responses: [{ status: 200, body: '# Example', headers: textHeaders() }],
+		responses: [
+			{
+				status: 200,
+				body: '# Example',
+				headers: textHeaders({ 'x-final-url': 'https://www.example.com/blog/' }),
+			},
+		],
 	});
 
 	assert.equal(requests.length, 1);
@@ -34,6 +40,7 @@ test('Get Markdown posts the URL synchronously and outputs the text with the req
 				url: 'https://example.com/blog',
 				markdown: '# Example',
 				token: 'tok_123',
+				finalUrl: 'https://www.example.com/blog/',
 				cache: 'miss',
 				credits: 1,
 			},
@@ -107,6 +114,7 @@ test('Get Metadata outputs the metadata object itself', async () => {
 		url: 'https://example.com/blog',
 		...meta,
 		token: 'tok_123',
+		finalUrl: null,
 		cache: 'miss',
 		credits: 5,
 	});

@@ -11,12 +11,16 @@ const TEXT_FIELDS: Partial<Record<Operation, string>> = {
 	summarize: 'summary',
 };
 
-/** What the response headers say about the request: its token, cache verdict and cost. */
+/**
+ * What the response headers say about the request: its token, where the page
+ * ended up after its redirects, the cache verdict and the cost.
+ */
 function requestFacts(result: OperationResult): IDataObject {
 	const { headers } = result.response;
 	const cost = Number(headers['x-quota-cost']);
 	return {
 		token: result.token ?? headers['x-result-token'] ?? null,
+		finalUrl: headers['x-final-url'] ?? null,
 		cache: headers['x-cache'] ?? null,
 		credits: Number.isFinite(cost) ? cost : null,
 	};

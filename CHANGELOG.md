@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Every output carries `finalUrl`: where the page ended up, after its redirects.
 - **Get Metadata** returns the fixed shape of `/meta` — `authors`, `published_at`, `image`, `feeds` and the rest, every key always present — and costs 1 credit.
 
 ## 0.1.1
