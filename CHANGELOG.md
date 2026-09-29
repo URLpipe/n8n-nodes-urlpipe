@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **Get Metadata** returns the fixed shape of `/meta` — `authors`, `published_at`, `image`, `feeds` and the rest, every key always present — and costs 1 credit.
+
 ## 0.1.1
 
 - Published from GitHub Actions with an npm provenance statement, so anyone can check the package was built from this repository.

@@ -37,7 +37,7 @@ export const operationProperty: INodeProperties = {
 		{
 			name: 'Get Metadata',
 			value: 'meta',
-			description: 'Read the title, description, language, main image, author and feed of a page',
+			description: 'Read the title, description, image, authors, dates, feeds and more of a page',
 			action: 'Get metadata of page',
 		},
 		{

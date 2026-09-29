@@ -39,7 +39,7 @@ Every operation except Get Result takes the page's **URL**. Each input item is o
 | **Get Rendered HTML** | The HTML after the page's JavaScript has run: `{url, html, …}` | 1 |
 | **Get Summary** | An AI summary of the page, as Markdown: `{url, summary, …}` | 17 |
 | **Take Screenshot** | The image as n8n binary data (field `data` by default, named after the host, such as `example.com.png`), plus `{url, resultUrl, mimeType, …}`. `resultUrl` is a link to the image that needs no API key and works for 30 days. | 1 |
-| **Get Metadata** | Title, description, language, main image, favicon, author, feed and publication date. | 5 |
+| **Get Metadata** | Everything the page declares about itself, with the same keys for every page: `{title, description, site_name, language, authors, published_at, image, favicon_url, feeds, keywords, open_graph, twitter, …}`. | 1 |
 | **Get Keywords** | `{url, keywords: [...]}`, picked out with AI. | 15 |
 | **Get Console Errors** | The errors, warnings and uncaught exceptions the page logs as it loads: `{url, entries: [{type, text}], errorCount, warningCount}` | 1 |
 | **Run Lighthouse Audit** | Scores for performance, accessibility, best practices and SEO, and the key metrics (LCP, CLS, TBT, …). Choose **Device** (mobile or desktop) and turn on **Include Audits** for all 150+ audits. | 2 |
