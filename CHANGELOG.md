@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0
 
 - **Get PDF**: the whole rendered page as a PDF file, with options for the paper, orientation, margins, scale, backgrounds and stylesheet.
 - **Extract Data**: data read off a page with AI, into the fields you define.
