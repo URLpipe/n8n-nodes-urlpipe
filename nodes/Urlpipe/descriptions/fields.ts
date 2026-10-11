@@ -5,9 +5,12 @@ const PAGE_OPERATIONS = [
 	'html',
 	'summarize',
 	'screenshot',
+	'pdf',
 	'meta',
 	'keywords',
+	'extract',
 	'console',
+	'technologies',
 	'lighthouse',
 	'scrape',
 ];
@@ -51,6 +54,7 @@ export const scrapeOperationsField: INodeProperties = {
 		{ name: 'Rendered HTML', value: 'html' },
 		{ name: 'Screenshot', value: 'screenshot' },
 		{ name: 'Summary', value: 'summarize' },
+		{ name: 'Technologies', value: 'technologies' },
 	],
 	displayOptions: { show: { resource: ['page'], operation: ['scrape'] } },
 };
@@ -85,8 +89,112 @@ export const binaryPropertyField: INodeProperties = {
 	type: 'string',
 	required: true,
 	default: 'data',
-	hint: 'The name of the output binary field to put the screenshot in',
-	displayOptions: { show: { resource: ['page'], operation: ['screenshot', 'scrape'] } },
+	hint: 'The name of the output binary field to put the screenshot or the PDF in',
+	displayOptions: { show: { resource: ['page'], operation: ['screenshot', 'pdf', 'scrape'] } },
+};
+
+export const extractFieldsField: INodeProperties = {
+	displayName: 'Fields',
+	name: 'extractFields',
+	type: 'json',
+	required: true,
+	default:
+		'[\n  { "name": "title", "type": "string" },\n  { "name": "price", "type": "number", "description": "The current price, without the currency" }\n]',
+	description:
+		'The data to read off the page, as a JSON list of fields. Each has a name, a type (string, number, integer, boolean, date, datetime, URL, email, object or array) and optionally a description of what to take. An object has its own fields; an array has items. The output carries exactly these names, empty where the page gives no value.',
+	displayOptions: { show: { resource: ['page'], operation: ['extract'] } },
+};
+
+export const instructionsField: INodeProperties = {
+	displayName: 'Instructions',
+	name: 'instructions',
+	type: 'string',
+	typeOptions: { rows: 2 },
+	default: '',
+	placeholder: 'e.g. Ignore the related products',
+	description: 'Guidance for the extraction, in plain words',
+	displayOptions: { show: { resource: ['page'], operation: ['extract'] } },
+};
+
+export const pdfOptionsField: INodeProperties = {
+	displayName: 'PDF Options',
+	name: 'pdfOptions',
+	type: 'collection',
+	placeholder: 'Add option',
+	default: {},
+	displayOptions: { show: { resource: ['page'], operation: ['pdf'] } },
+	options: [
+		{
+			displayName: 'Landscape',
+			name: 'landscape',
+			type: 'boolean',
+			default: false,
+			description: 'Whether to turn the paper sideways',
+		},
+		{
+			displayName: 'Margin',
+			name: 'margin',
+			type: 'number',
+			default: 10,
+			typeOptions: { minValue: 0, maxValue: 50 },
+			description: 'The margin on every side in millimetres, from 0 to 50',
+		},
+		{
+			displayName: 'Paper Size',
+			name: 'paperSize',
+			type: 'options',
+			default: 'a4',
+			options: [
+				{ name: 'A3', value: 'a3' },
+				{ name: 'A4', value: 'a4' },
+				{ name: 'A5', value: 'a5' },
+				{ name: 'Legal', value: 'legal' },
+				{ name: 'Letter', value: 'letter' },
+				{ name: 'Tabloid', value: 'tabloid' },
+			],
+		},
+		{
+			displayName: 'Print Backgrounds',
+			name: 'printBackground',
+			type: 'boolean',
+			default: true,
+			description: 'Whether to print background colours and images',
+		},
+		{
+			displayName: 'Scale',
+			name: 'scale',
+			type: 'number',
+			default: 100,
+			typeOptions: { minValue: 10, maxValue: 200 },
+			description: 'The scale of the page in percent, from 10 to 200',
+		},
+		{
+			displayName: 'Single Page',
+			name: 'singlePage',
+			type: 'boolean',
+			default: false,
+			description:
+				'Whether to make one page as tall as the document, instead of cutting it into sheets',
+		},
+		{
+			displayName: 'Stylesheet',
+			name: 'media',
+			type: 'options',
+			default: 'print',
+			options: [
+				{
+					name: 'Print',
+					value: 'print',
+					description: "The page's print stylesheet, as a browser prints it",
+				},
+				{
+					name: 'Screen',
+					value: 'screen',
+					description: 'The page as it looks in a browser window',
+				},
+			],
+		},
+	],
 };
 
 export const screenshotOptionsField: INodeProperties = {
@@ -177,6 +285,9 @@ export const fieldProperties: INodeProperties[] = [
 	scrapeOperationsField,
 	deviceField,
 	includeAuditsField,
+	extractFieldsField,
+	instructionsField,
 	binaryPropertyField,
 	screenshotOptionsField,
+	pdfOptionsField,
 ];

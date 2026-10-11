@@ -10,7 +10,7 @@ import { NodeApiError, NodeConnectionTypes, NodeOperationError } from 'n8n-workf
 import { fieldProperties } from './descriptions/fields';
 import { operationProperty, resourceProperty } from './descriptions/operation';
 import { pageOptionsField, resultOptionsField } from './descriptions/options';
-import type { PageOptions, ScreenshotOptions } from './shared/body';
+import type { PageOptions, PdfOptions, ScreenshotOptions } from './shared/body';
 import { buildBody } from './shared/body';
 import type { Operation } from './shared/constants';
 import { CREDENTIAL_NAME, DEFAULT_WAIT_TIMEOUT_SECONDS, OPERATIONS } from './shared/constants';
@@ -22,6 +22,27 @@ interface ResultOptions {
 	binaryPropertyName?: string;
 	waitUntilReady?: boolean;
 	waitTimeout?: number;
+}
+
+/** The 'Fields' parameter as the list the API takes: it arrives as JSON text, or already parsed. */
+function extractFields(ctx: IExecuteFunctions, itemIndex: number): IDataObject[] {
+	const raw = ctx.getNodeParameter('extractFields', itemIndex, '') as unknown;
+	let fields: unknown = raw;
+	if (typeof raw === 'string') {
+		try {
+			fields = raw.trim() ? (JSON.parse(raw) as unknown) : [];
+		} catch {
+			fields = undefined;
+		}
+	}
+	if (!Array.isArray(fields) || fields.length === 0) {
+		throw new NodeOperationError(ctx.getNode(), "The 'Fields' parameter is not a list of fields", {
+			description:
+				'Enter a JSON list such as [{ "name": "price", "type": "number" }]: one entry per value to read off the page.',
+			itemIndex,
+		});
+	}
+	return fields as IDataObject[];
 }
 
 async function runPageOperation(
@@ -65,6 +86,15 @@ async function runPageOperation(
 		screenshotOptions: withScreenshot
 			? (ctx.getNodeParameter('screenshotOptions', itemIndex, {}) as ScreenshotOptions)
 			: undefined,
+		pdfOptions:
+			operation === 'pdf'
+				? (ctx.getNodeParameter('pdfOptions', itemIndex, {}) as PdfOptions)
+				: undefined,
+		fields: operation === 'extract' ? extractFields(ctx, itemIndex) : undefined,
+		instructions:
+			operation === 'extract'
+				? (ctx.getNodeParameter('instructions', itemIndex, '') as string)
+				: undefined,
 	});
 
 	const waitTimeout = options.waitTimeout ?? DEFAULT_WAIT_TIMEOUT_SECONDS;
@@ -72,9 +102,10 @@ async function runPageOperation(
 	const pageUrl = body.url as string;
 	if (result.status !== 'completed') return shapePending(result, pageUrl, itemIndex);
 
-	const binaryPropertyName = withScreenshot
-		? (ctx.getNodeParameter('binaryPropertyName', itemIndex, 'data') as string)
-		: 'data';
+	const binaryPropertyName =
+		withScreenshot || operation === 'pdf'
+			? (ctx.getNodeParameter('binaryPropertyName', itemIndex, 'data') as string)
+			: 'data';
 	return await shapeCompleted(ctx, {
 		operation,
 		result,
@@ -123,9 +154,9 @@ export class Urlpipe implements INodeType {
 		group: ['transform'],
 		version: [1],
 		subtitle:
-			'={{ {"console": "Get Console Errors", "keywords": "Get Keywords", "markdown": "Get Markdown", "meta": "Get Metadata", "html": "Get Rendered HTML", "getResult": "Get Result", "summarize": "Get Summary", "lighthouse": "Run Lighthouse Audit", "scrape": "Scrape", "screenshot": "Take Screenshot"}[$parameter["operation"]] }}',
+			'={{ {"technologies": "Detect Technologies", "extract": "Extract Data", "console": "Get Console Errors", "keywords": "Get Keywords", "markdown": "Get Markdown", "meta": "Get Metadata", "pdf": "Get PDF", "html": "Get Rendered HTML", "getResult": "Get Result", "summarize": "Get Summary", "lighthouse": "Run Lighthouse Audit", "scrape": "Scrape", "screenshot": "Take Screenshot"}[$parameter["operation"]] }}',
 		description:
-			'Turn any URL into Markdown, a screenshot, metadata, console errors or a Lighthouse audit, rendered in real Chrome',
+			'Turn any URL into Markdown, a screenshot, a PDF, metadata, data in your own fields, console errors or a Lighthouse audit, rendered in real Chrome',
 		defaults: {
 			name: 'URLpipe',
 		},

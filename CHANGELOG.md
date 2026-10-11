@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **Get PDF**: the whole rendered page as a PDF file, with options for the paper, orientation, margins, scale, backgrounds and stylesheet.
+- **Extract Data**: data read off a page with AI, into the fields you define.
+- **Detect Technologies**: what a site is built with, with versions. It is also an operation of **Scrape**.
+- **Block Popups** under Options removes newsletter prompts, app-install banners and promotional popups before the page is read.
 - Every output carries `finalUrl`: where the page ended up, after its redirects.
 - **Get Metadata** returns the fixed shape of `/meta` — `authors`, `published_at`, `image`, `feeds` and the rest, every key always present — and costs 1 credit.
 

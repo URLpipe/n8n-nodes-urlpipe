@@ -2,7 +2,7 @@
 
 This is an n8n community node. It lets you use [URLpipe](https://urlpipe.dev) in your n8n workflows.
 
-URLpipe turns any URL into clean data: Markdown, a screenshot, metadata, console errors or a Lighthouse audit. Every page is rendered in real Chrome first, so sites built with JavaScript come back complete, and a repeat of the same request within seven days is served from the cache for free.
+URLpipe turns any URL into clean data: Markdown, a screenshot, a PDF, metadata, data in your own fields, console errors or a Lighthouse audit. Every page is rendered in real Chrome first, so sites built with JavaScript come back complete, and a repeat of the same request within seven days is served from the cache for free.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/sustainable-use-license/) workflow automation tool.
 
@@ -39,16 +39,21 @@ Every operation except Get Result takes the page's **URL**. Each input item is o
 | **Get Rendered HTML** | The HTML after the page's JavaScript has run: `{url, html, …}` | 1 |
 | **Get Summary** | An AI summary of the page, as Markdown: `{url, summary, …}` | 17 |
 | **Take Screenshot** | The image as n8n binary data (field `data` by default, named after the host, such as `example.com.png`), plus `{url, resultUrl, mimeType, …}`. `resultUrl` is a link to the image that needs no API key and works for 30 days. | 1 |
+| **Get PDF** | The whole rendered page as a PDF, as n8n binary data (named after the host, such as `example.com.pdf`), plus `{url, resultUrl, mimeType, …}`. | 1 |
 | **Get Metadata** | Everything the page declares about itself, with the same keys for every page: `{title, description, site_name, language, authors, published_at, image, favicon_url, feeds, keywords, open_graph, twitter, …}`. | 1 |
 | **Get Keywords** | `{url, keywords: [...]}`, picked out with AI. | 15 |
+| **Extract Data** | Data read off the page with AI, into the **Fields** you define: `{url, data: {<your fields>}, …}`, with exactly those names and an empty value where the page gives none. Add **Instructions** to guide it. | 24 |
 | **Get Console Errors** | The errors, warnings and uncaught exceptions the page logs as it loads: `{url, entries: [{type, text}], errorCount, warningCount}` | 1 |
+| **Detect Technologies** | What the site is built with: `{url, technologies: [{name, version, confidence, categories, …}]}`: its CMS, frameworks, analytics, CDN and web server. | 1 |
 | **Run Lighthouse Audit** | Scores for performance, accessibility, best practices and SEO, and the key metrics (LCP, CLS, TBT, …). Choose **Device** (mobile or desktop) and turn on **Include Audits** for all 150+ audits. | 2 |
 | **Scrape** | Several of the above off one page visit: pick them under **Operations**. You get `{url, operations: {<name>: {success, result, error, cached}}}`; a screenshot among them goes to binary data. Each operation is billed as it would be on its own, but you get them all much sooner. | sum |
-| **Get Result** | The result of an earlier request, by its **Token**. Set **Original Operation** to shape it like that operation (a screenshot as a file, for example), and **Wait Until Ready** to keep checking until it is done. | 0 |
+| **Get Result** | The result of an earlier request, by its **Token**. Set **Original Operation** to shape it like that operation (a screenshot or a PDF as a file, for example), and **Wait Until Ready** to keep checking until it is done. | 0 |
 
 Every output carries `token` (fetch the same result again, free, for 30 days), `finalUrl` (where the page ended up, after its redirects), `cache` (`hit` when it came from the cache and cost nothing) and `credits` (what the call cost).
 
-Take Screenshot and Scrape also take **Screenshot Options**: Full Page, Viewport Width, Viewport Height, Scale (1x to 3x), Format (PNG, JPEG or WebP), Quality, Dark Mode and Element Selector (capture one element instead of the page).
+Take Screenshot and Scrape also take **Screenshot Options**: Full Page, Viewport Width, Viewport Height, Scale (1x to 3x), Format (PNG, JPEG or WebP), Quality, Dark Mode and Element Selector (capture one element instead of the page). Get PDF takes **PDF Options**: Paper Size, Landscape, Margin, Scale, Print Backgrounds, Stylesheet (print or screen) and Single Page.
+
+**Fields** for Extract Data is a JSON list, one entry per value: `[{ "name": "price", "type": "number", "description": "The current price" }]`. A type is `string`, `number`, `integer`, `boolean`, `date`, `datetime`, `url`, `email`, `object` (with its own `fields`) or `array` (with `items`).
 
 ## Options
 
@@ -57,12 +62,12 @@ These are under **Options** on every page operation:
 - **Max Age**: how fresh a stored result must be to be reused for free, as seconds (`3600`) or a duration (`2 hours`, `3 days`). Empty means 7 days; `0` always loads the page again.
 - **Labels**: your own name and value pairs, such as `client: acme`. The URLpipe dashboard filters history and totals credits by them, and they come back with async results.
 - **Residential**: load the page from a residential address, for sites that serve a datacentre less than they serve a browser. Adds 25 credits per page visit.
-- **Block Ads** and **Block Cookie Banners**: take ads and consent banners out of the page before it is read. Pages with ads usually load much faster.
+- **Block Ads**, **Block Cookie Banners** and **Block Popups**: take ads, consent banners and newsletter or app-install popups out of the page before it is read. Pages with ads usually load much faster.
 - **Wait for Selector**: wait up to 10 seconds for an element, for pages whose content arrives after they load.
 - **Wait for Result** and **Wait Timeout**: see below.
 - **Report To**: a webhook URL for the result, when Wait for Result is off.
 
-Lighthouse audits load the page for themselves, so the page options (ads, cookie banners, selector) don't apply to Run Lighthouse Audit.
+Lighthouse audits load the page for themselves, so the page options (ads, cookie banners, popups, selector) don't apply to Run Lighthouse Audit.
 
 ## Waiting for results
 

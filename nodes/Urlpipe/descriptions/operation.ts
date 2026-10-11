@@ -17,6 +17,19 @@ export const operationProperty: INodeProperties = {
 	displayOptions: { show: { resource: ['page'] } },
 	options: [
 		{
+			name: 'Detect Technologies',
+			value: 'technologies',
+			description:
+				'List what a site is built with: its CMS, frameworks, analytics, CDN and web server, with versions',
+			action: 'Detect technologies of page',
+		},
+		{
+			name: 'Extract Data',
+			value: 'extract',
+			description: 'Read data off a page with AI, into the fields you define',
+			action: 'Extract data from page',
+		},
+		{
 			name: 'Get Console Errors',
 			value: 'console',
 			description: 'List the errors, warnings and uncaught exceptions a page logs as it loads',
@@ -39,6 +52,12 @@ export const operationProperty: INodeProperties = {
 			value: 'meta',
 			description: 'Read the title, description, image, authors, dates, feeds and more of a page',
 			action: 'Get metadata of page',
+		},
+		{
+			name: 'Get PDF',
+			value: 'pdf',
+			description: 'Print the whole rendered page to a PDF file',
+			action: 'Get PDF of page',
 		},
 		{
 			name: 'Get Rendered HTML',

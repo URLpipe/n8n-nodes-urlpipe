@@ -5,6 +5,7 @@ import type { Operation } from './constants';
 export interface PageOptions {
 	blockAds?: boolean;
 	blockCookieBanners?: boolean;
+	blockPopups?: boolean;
 	labels?: { label?: Array<{ name?: string; value?: string }> };
 	maxAge?: string | number;
 	reportTo?: string;
@@ -25,6 +26,16 @@ export interface ScreenshotOptions {
 	viewportWidth?: number;
 }
 
+export interface PdfOptions {
+	landscape?: boolean;
+	margin?: number;
+	media?: string;
+	paperSize?: string;
+	printBackground?: boolean;
+	scale?: number;
+	singlePage?: boolean;
+}
+
 export interface BodyInput {
 	operation: Operation;
 	url: string;
@@ -33,6 +44,9 @@ export interface BodyInput {
 	device?: string;
 	includeAudits?: boolean;
 	screenshotOptions?: ScreenshotOptions;
+	pdfOptions?: PdfOptions;
+	fields?: IDataObject[];
+	instructions?: string;
 }
 
 /** "3600" is sent as a number of seconds; "3 days" as the duration it is. */
@@ -57,6 +71,7 @@ function pageOptionsValue(options: PageOptions): IDataObject | undefined {
 	const pageOptions: IDataObject = {};
 	if (options.blockAds) pageOptions.block_ads = true;
 	if (options.blockCookieBanners) pageOptions.block_cookie_banners = true;
+	if (options.blockPopups) pageOptions.block_popups = true;
 	if (options.waitForSelector && options.waitForSelector.trim()) {
 		pageOptions.wait_for_selector = options.waitForSelector.trim();
 	}
@@ -76,6 +91,19 @@ function screenshotOptionsValue(options: ScreenshotOptions | undefined): IDataOb
 	if (options.quality !== undefined) result.quality = options.quality;
 	if (options.darkMode !== undefined) result.dark_mode = options.darkMode;
 	if (options.selector && options.selector.trim()) result.selector = options.selector.trim();
+	return Object.keys(result).length ? result : undefined;
+}
+
+function pdfOptionsValue(options: PdfOptions | undefined): IDataObject | undefined {
+	if (!options) return undefined;
+	const result: IDataObject = {};
+	if (options.paperSize) result.paper_size = options.paperSize;
+	if (options.landscape !== undefined) result.landscape = options.landscape;
+	if (options.printBackground !== undefined) result.print_background = options.printBackground;
+	if (options.scale !== undefined) result.scale = options.scale;
+	if (options.margin !== undefined) result.margin = options.margin;
+	if (options.media) result.media = options.media;
+	if (options.singlePage !== undefined) result.single_page = options.singlePage;
 	return Object.keys(result).length ? result : undefined;
 }
 
@@ -113,6 +141,18 @@ export function buildBody(input: BodyInput): IDataObject {
 	if (included.includes('screenshot')) {
 		const screenshotOptions = screenshotOptionsValue(input.screenshotOptions);
 		if (screenshotOptions) body.screenshot_options = screenshotOptions;
+	}
+
+	if (operation === 'pdf') {
+		const pdfOptions = pdfOptionsValue(input.pdfOptions);
+		if (pdfOptions) body.pdf_options = pdfOptions;
+	}
+
+	if (operation === 'extract') {
+		body.fields = input.fields ?? [];
+		if (input.instructions && input.instructions.trim()) {
+			body.instructions = input.instructions.trim();
+		}
 	}
 
 	if (included.includes('lighthouse')) {

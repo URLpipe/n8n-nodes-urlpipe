@@ -24,9 +24,12 @@ export type Operation =
 	| 'html'
 	| 'summarize'
 	| 'screenshot'
+	| 'pdf'
 	| 'meta'
 	| 'keywords'
+	| 'extract'
 	| 'console'
+	| 'technologies'
 	| 'lighthouse'
 	| 'scrape';
 
@@ -35,9 +38,12 @@ export const OPERATIONS: Operation[] = [
 	'html',
 	'summarize',
 	'screenshot',
+	'pdf',
 	'meta',
 	'keywords',
+	'extract',
 	'console',
+	'technologies',
 	'lighthouse',
 	'scrape',
 ];

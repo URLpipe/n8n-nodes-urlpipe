@@ -26,9 +26,12 @@ export const pageOptionsField: INodeProperties = {
 				'html',
 				'summarize',
 				'screenshot',
+				'pdf',
 				'meta',
 				'keywords',
+				'extract',
 				'console',
+				'technologies',
 				'lighthouse',
 				'scrape',
 			],
@@ -51,6 +54,15 @@ export const pageOptionsField: INodeProperties = {
 			default: false,
 			description:
 				'Whether to remove cookie-consent banners and their policy text from the page. Nothing is clicked, so no consent is given.',
+			displayOptions: { hide: { '/operation': ['lighthouse'] } },
+		},
+		{
+			displayName: 'Block Popups',
+			name: 'blockPopups',
+			type: 'boolean',
+			default: false,
+			description:
+				'Whether to remove newsletter prompts, app-install banners and promotional popups laid over the page',
 			displayOptions: { hide: { '/operation': ['lighthouse'] } },
 		},
 		{
@@ -148,13 +160,16 @@ export const resultOptionsField: INodeProperties = {
 			type: 'options',
 			default: 'auto',
 			description:
-				'The operation that produced the token, so the result is shaped the same way. Choose Take Screenshot to get the image as a file.',
+				'The operation that produced the token, so the result is shaped the same way. Choose Take Screenshot or Get PDF to get the file.',
 			options: [
 				{ name: 'Detect From Result', value: 'auto' },
+				{ name: 'Detect Technologies', value: 'technologies' },
+				{ name: 'Extract Data', value: 'extract' },
 				{ name: 'Get Console Errors', value: 'console' },
 				{ name: 'Get Keywords', value: 'keywords' },
 				{ name: 'Get Markdown', value: 'markdown' },
 				{ name: 'Get Metadata', value: 'meta' },
+				{ name: 'Get PDF', value: 'pdf' },
 				{ name: 'Get Rendered HTML', value: 'html' },
 				{ name: 'Get Summary', value: 'summarize' },
 				{ name: 'Run Lighthouse Audit', value: 'lighthouse' },
@@ -167,7 +182,7 @@ export const resultOptionsField: INodeProperties = {
 			name: 'binaryPropertyName',
 			type: 'string',
 			default: 'data',
-			description: 'The name of the output binary field to put a screenshot in',
+			description: 'The name of the output binary field to put a screenshot or a PDF in',
 		},
 		{
 			displayName: 'Wait Until Ready',

@@ -56,11 +56,12 @@ const EXTENSIONS: Record<string, string> = {
 	'image/png': 'png',
 	'image/jpeg': 'jpg',
 	'image/webp': 'webp',
+	'application/pdf': 'pdf',
 };
 
 /** A file name from the page's host, e.g. "example.com.png". */
 export function fileNameFor(url: string | undefined, mimeType: string): string {
-	let base = 'screenshot';
+	let base = mimeType === 'application/pdf' ? 'page' : 'screenshot';
 	if (url) {
 		try {
 			base = new URL(url).hostname || base;
@@ -79,6 +80,16 @@ async function screenshotBinary(
 	const image = Buffer.from(base64.trim(), 'base64');
 	const mimeType = mimeTypeOf(image);
 	return await ctx.helpers.prepareBinaryData(image, fileNameFor(url, mimeType), mimeType);
+}
+
+async function pdfBinary(
+	ctx: IExecuteFunctions,
+	base64: string,
+	url: string | undefined,
+): Promise<IBinaryData> {
+	const mimeType = 'application/pdf';
+	const pdf = Buffer.from(base64.trim(), 'base64');
+	return await ctx.helpers.prepareBinaryData(pdf, fileNameFor(url, mimeType), mimeType);
 }
 
 export interface ShapeInput {
@@ -108,8 +119,11 @@ export async function shapeCompleted(
 		return { json: withUrl(url, { [textField]: response.text, ...facts }), pairedItem };
 	}
 
-	if (operation === 'screenshot') {
-		const binary = await screenshotBinary(ctx, response.text, url);
+	if (operation === 'screenshot' || operation === 'pdf') {
+		const binary =
+			operation === 'pdf'
+				? await pdfBinary(ctx, response.text, url)
+				: await screenshotBinary(ctx, response.text, url);
 		return {
 			json: withUrl(url, {
 				resultUrl: response.headers['x-result-url'] ?? null,
@@ -160,7 +174,12 @@ export async function shapeCompleted(
 		return await shapeScrape(ctx, object, facts, url, binaryPropertyName, itemIndex);
 	}
 
-	// meta and lighthouse: the object as the API sent it.
+	// The fields are the user's own names, so they stay together under one key.
+	if (operation === 'extract') {
+		return { json: withUrl(url, { data: object, ...facts }), pairedItem };
+	}
+
+	// meta, technologies and lighthouse: the object as the API sent it.
 	return { json: { ...withUrl(url, {}), ...object, ...facts }, pairedItem };
 }
 
