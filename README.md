@@ -46,12 +46,12 @@ Every operation except Get Result takes the page's **URL**. Each input item is o
 | **Get Console Errors** | The errors, warnings and uncaught exceptions the page logs as it loads: `{url, entries: [{type, text}], errorCount, warningCount}` | 1 |
 | **Detect Technologies** | What the site is built with: `{url, technologies: [{name, version, confidence, categories, …}]}`: its CMS, frameworks, analytics, CDN and web server. | 1 |
 | **Run Lighthouse Audit** | Scores for performance, accessibility, best practices and SEO, and the key metrics (LCP, CLS, TBT, …). Choose **Device** (mobile or desktop) and turn on **Include Audits** for all 150+ audits. | 2 |
-| **Scrape** | Several of the above off one page visit: pick them under **Operations**. You get `{url, operations: {<name>: {success, result, error, cached}}}`; a screenshot among them goes to binary data. Each operation is billed as it would be on its own, but you get them all much sooner. | sum |
+| **Scrape** | Several of the above off one page visit: pick them under **Operations**. You get `{url, operations: {<name>: {success, result, error, cached}}}`; a screenshot or a PDF among them goes to binary data (with both, the PDF's field is the screenshot's name followed by `_pdf`). With **Extracted Data** among them, the node asks for the **Fields** as Extract Data does. Each operation is billed as it would be on its own, but you get them all much sooner. | sum |
 | **Get Result** | The result of an earlier request, by its **Token**. Set **Original Operation** to shape it like that operation (a screenshot or a PDF as a file, for example), and **Wait Until Ready** to keep checking until it is done. | 0 |
 
 Every output carries `token` (fetch the same result again, free, for 30 days), `finalUrl` (where the page ended up, after its redirects), `cache` (`hit` when it came from the cache and cost nothing) and `credits` (what the call cost).
 
-Take Screenshot and Scrape also take **Screenshot Options**: Full Page, Viewport Width, Viewport Height, Scale (1x to 3x), Format (PNG, JPEG or WebP), Quality, Dark Mode and Element Selector (capture one element instead of the page). Get PDF takes **PDF Options**: Paper Size, Landscape, Margin, Scale, Print Backgrounds, Stylesheet (print or screen) and Single Page.
+Take Screenshot and Scrape also take **Screenshot Options**: Full Page, Viewport Width, Viewport Height, Scale (1x to 3x), Format (PNG, JPEG or WebP), Quality, Dark Mode and Element Selector (capture one element instead of the page). Get PDF and Scrape take **PDF Options**: Paper Size, Landscape, Margin, Scale, Print Backgrounds, Stylesheet (print or screen) and Single Page.
 
 **Fields** for Extract Data is a JSON list, one entry per value: `[{ "name": "price", "type": "number", "description": "The current price" }]`. A type is `string`, `number`, `integer`, `boolean`, `date`, `datetime`, `url`, `email`, `object` (with its own `fields`) or `array` (with `items`).
 

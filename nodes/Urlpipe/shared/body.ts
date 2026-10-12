@@ -143,12 +143,12 @@ export function buildBody(input: BodyInput): IDataObject {
 		if (screenshotOptions) body.screenshot_options = screenshotOptions;
 	}
 
-	if (operation === 'pdf') {
+	if (included.includes('pdf')) {
 		const pdfOptions = pdfOptionsValue(input.pdfOptions);
 		if (pdfOptions) body.pdf_options = pdfOptions;
 	}
 
-	if (operation === 'extract') {
+	if (included.includes('extract')) {
 		body.fields = input.fields ?? [];
 		if (input.instructions && input.instructions.trim()) {
 			body.instructions = input.instructions.trim();

@@ -47,10 +47,12 @@ export const scrapeOperationsField: INodeProperties = {
 	description: 'What to get from the page. Each one is billed as it would be on its own.',
 	options: [
 		{ name: 'Console Errors', value: 'console' },
+		{ name: 'Extracted Data', value: 'extract' },
 		{ name: 'Keywords', value: 'keywords' },
 		{ name: 'Lighthouse Audit', value: 'lighthouse' },
 		{ name: 'Markdown', value: 'markdown' },
 		{ name: 'Metadata', value: 'meta' },
+		{ name: 'PDF', value: 'pdf' },
 		{ name: 'Rendered HTML', value: 'html' },
 		{ name: 'Screenshot', value: 'screenshot' },
 		{ name: 'Summary', value: 'summarize' },
@@ -89,11 +91,17 @@ export const binaryPropertyField: INodeProperties = {
 	type: 'string',
 	required: true,
 	default: 'data',
-	hint: 'The name of the output binary field to put the screenshot or the PDF in',
+	hint: 'The name of the output binary field to put the screenshot or the PDF in. A scrape that gets both puts the PDF in this name followed by _pdf.',
 	displayOptions: { show: { resource: ['page'], operation: ['screenshot', 'pdf', 'scrape'] } },
 };
 
-export const extractFieldsField: INodeProperties = {
+/** Shown for Extract Data, and for a Scrape that has Extracted Data among its operations. */
+const EXTRACT_DISPLAY = [
+	{ show: { resource: ['page'], operation: ['extract'] } },
+	{ show: { resource: ['page'], operation: ['scrape'], scrapeOperations: ['extract'] } },
+];
+
+const extractFieldsBase: INodeProperties = {
 	displayName: 'Fields',
 	name: 'extractFields',
 	type: 'json',
@@ -102,10 +110,9 @@ export const extractFieldsField: INodeProperties = {
 		'[\n  { "name": "title", "type": "string" },\n  { "name": "price", "type": "number", "description": "The current price, without the currency" }\n]',
 	description:
 		'The data to read off the page, as a JSON list of fields. Each has a name, a type (string, number, integer, boolean, date, datetime, URL, email, object or array) and optionally a description of what to take. An object has its own fields; an array has items. The output carries exactly these names, empty where the page gives no value.',
-	displayOptions: { show: { resource: ['page'], operation: ['extract'] } },
 };
 
-export const instructionsField: INodeProperties = {
+const instructionsBase: INodeProperties = {
 	displayName: 'Instructions',
 	name: 'instructions',
 	type: 'string',
@@ -113,8 +120,12 @@ export const instructionsField: INodeProperties = {
 	default: '',
 	placeholder: 'e.g. Ignore the related products',
 	description: 'Guidance for the extraction, in plain words',
-	displayOptions: { show: { resource: ['page'], operation: ['extract'] } },
 };
+
+export const extractProperties: INodeProperties[] = EXTRACT_DISPLAY.flatMap((displayOptions) => [
+	{ ...extractFieldsBase, displayOptions },
+	{ ...instructionsBase, displayOptions },
+]);
 
 export const pdfOptionsField: INodeProperties = {
 	displayName: 'PDF Options',
@@ -122,7 +133,7 @@ export const pdfOptionsField: INodeProperties = {
 	type: 'collection',
 	placeholder: 'Add option',
 	default: {},
-	displayOptions: { show: { resource: ['page'], operation: ['pdf'] } },
+	displayOptions: { show: { resource: ['page'], operation: ['pdf', 'scrape'] } },
 	options: [
 		{
 			displayName: 'Landscape',
@@ -285,8 +296,7 @@ export const fieldProperties: INodeProperties[] = [
 	scrapeOperationsField,
 	deviceField,
 	includeAuditsField,
-	extractFieldsField,
-	instructionsField,
+	...extractProperties,
 	binaryPropertyField,
 	screenshotOptionsField,
 	pdfOptionsField,

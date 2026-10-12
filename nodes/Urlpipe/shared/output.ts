@@ -183,7 +183,11 @@ export async function shapeCompleted(
 	return { json: { ...withUrl(url, {}), ...object, ...facts }, pairedItem };
 }
 
-/** A scrape's screenshot moves out of the JSON and into a binary field. */
+/**
+ * A scrape's screenshot and PDF move out of the JSON and into binary fields.
+ * The PDF takes the field's name when the scrape asked for no screenshot, and
+ * that name followed by _pdf when it asked for both.
+ */
 async function shapeScrape(
 	ctx: IExecuteFunctions,
 	object: IDataObject,
@@ -200,14 +204,29 @@ async function shapeScrape(
 		pairedItem: { item: itemIndex },
 	};
 
+	const binaries: Record<string, IBinaryData> = {};
+
 	if (screenshot?.success === true && typeof screenshot.result === 'string') {
 		const binary = await screenshotBinary(ctx, screenshot.result, pageUrl);
 		operations.screenshot = {
 			...screenshot,
 			result: { binaryProperty: binaryPropertyName, mimeType: binary.mimeType },
 		};
-		item.binary = { [binaryPropertyName]: binary };
+		binaries[binaryPropertyName] = binary;
 	}
+
+	const pdf = operations.pdf as IDataObject | undefined;
+	if (pdf?.success === true && typeof pdf.result === 'string') {
+		const pdfPropertyName = screenshot ? `${binaryPropertyName}_pdf` : binaryPropertyName;
+		const binary = await pdfBinary(ctx, pdf.result, pageUrl);
+		operations.pdf = {
+			...pdf,
+			result: { binaryProperty: pdfPropertyName, mimeType: binary.mimeType },
+		};
+		binaries[pdfPropertyName] = binary;
+	}
+
+	if (Object.keys(binaries).length) item.binary = binaries;
 	return item;
 }
 

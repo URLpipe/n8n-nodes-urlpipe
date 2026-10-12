@@ -147,3 +147,94 @@ test('Detect Technologies outputs the result as the API sent it', async () => {
 	assert.equal(output[0].json.url, 'https://example.com');
 	assert.equal(output[0].json.token, 'tok_123');
 });
+
+test('Scrape with a PDF and extracted data sends their options and moves the PDF into binary data', async () => {
+	const fields = [{ name: 'price', type: 'number' }];
+	const scrape = {
+		url: 'https://example.com/shoe',
+		operations: {
+			pdf: { success: true, result: PDF.toString('base64'), cached: false },
+			extract: { success: true, result: { price: 89.5 }, cached: false },
+		},
+	};
+	const { output, requests } = await run({
+		params: {
+			resource: 'page',
+			operation: 'scrape',
+			url: 'https://example.com/shoe',
+			scrapeOperations: ['pdf', 'extract'],
+			binaryPropertyName: 'file',
+			pdfOptions: { paperSize: 'letter' },
+			extractFields: JSON.stringify(fields),
+			instructions: 'Prices in euros.',
+		},
+		responses: [{ status: 200, body: scrape, headers: jsonHeaders() }],
+	});
+
+	assert.deepEqual(requests[0].options.body, {
+		url: 'https://example.com/shoe',
+		sync: true,
+		operations: ['pdf', 'extract'],
+		pdf_options: { paper_size: 'letter' },
+		fields,
+		instructions: 'Prices in euros.',
+	});
+
+	const [item] = output;
+	assert.deepEqual(item.json.operations.extract.result, { price: 89.5 });
+	assert.deepEqual(item.json.operations.pdf.result, {
+		binaryProperty: 'file',
+		mimeType: 'application/pdf',
+	});
+	assert.equal(item.binary.file.fileName, 'example.com.pdf');
+});
+
+test('Scrape with a screenshot and a PDF outputs both files', async () => {
+	const PNG = Buffer.from('89504e470d0a1a0a', 'hex');
+	const scrape = {
+		url: 'https://example.com',
+		operations: {
+			screenshot: { success: true, result: PNG.toString('base64'), cached: false },
+			pdf: { success: true, result: PDF.toString('base64'), cached: false },
+		},
+	};
+	const { output, requests } = await run({
+		params: {
+			resource: 'page',
+			operation: 'scrape',
+			url: 'https://example.com',
+			scrapeOperations: ['screenshot', 'pdf'],
+			binaryPropertyName: 'data',
+		},
+		responses: [{ status: 200, body: scrape, headers: jsonHeaders() }],
+	});
+
+	// No extraction among the operations, so no fields are sent.
+	assert.deepEqual(requests[0].options.body, {
+		url: 'https://example.com',
+		sync: true,
+		operations: ['screenshot', 'pdf'],
+	});
+	assert.equal(output[0].binary.data.mimeType, 'image/png');
+	assert.equal(output[0].binary.data_pdf.mimeType, 'application/pdf');
+	assert.equal(output[0].json.operations.pdf.result.binaryProperty, 'data_pdf');
+});
+
+test('The extraction fields show for a Scrape only when it extracts', () => {
+	const { NodeHelpers } = require('n8n-workflow');
+	const { Urlpipe } = require('../dist/nodes/Urlpipe/Urlpipe.node.js');
+	const node = { typeVersion: 1, parameters: {} };
+	const shown = (parameters) =>
+		new Urlpipe().description.properties
+			.filter((property) => NodeHelpers.displayParameter(parameters, property, node, null))
+			.map((property) => property.name);
+
+	const scrape = { resource: 'page', operation: 'scrape' };
+	const extracting = shown({ ...scrape, scrapeOperations: ['markdown', 'extract'] });
+	assert.equal(extracting.filter((name) => name === 'extractFields').length, 1);
+	assert.equal(extracting.filter((name) => name === 'instructions').length, 1);
+
+	const names = new Set(shown({ ...scrape, scrapeOperations: ['markdown'] }));
+	assert.equal(names.has('extractFields'), false);
+	assert.equal(shown({ resource: 'page', operation: 'extract' }).includes('extractFields'), true);
+});

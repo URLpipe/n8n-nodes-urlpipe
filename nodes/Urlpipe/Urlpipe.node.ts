@@ -72,6 +72,9 @@ async function runPageOperation(
 		});
 	}
 
+	const withPdf = operation === 'pdf' || operation === 'scrape';
+	const withExtract = operation === 'extract' || scrapeOperations?.includes('extract') === true;
+
 	const body = buildBody({
 		operation,
 		url,
@@ -86,15 +89,13 @@ async function runPageOperation(
 		screenshotOptions: withScreenshot
 			? (ctx.getNodeParameter('screenshotOptions', itemIndex, {}) as ScreenshotOptions)
 			: undefined,
-		pdfOptions:
-			operation === 'pdf'
-				? (ctx.getNodeParameter('pdfOptions', itemIndex, {}) as PdfOptions)
-				: undefined,
-		fields: operation === 'extract' ? extractFields(ctx, itemIndex) : undefined,
-		instructions:
-			operation === 'extract'
-				? (ctx.getNodeParameter('instructions', itemIndex, '') as string)
-				: undefined,
+		pdfOptions: withPdf
+			? (ctx.getNodeParameter('pdfOptions', itemIndex, {}) as PdfOptions)
+			: undefined,
+		fields: withExtract ? extractFields(ctx, itemIndex) : undefined,
+		instructions: withExtract
+			? (ctx.getNodeParameter('instructions', itemIndex, '') as string)
+			: undefined,
 	});
 
 	const waitTimeout = options.waitTimeout ?? DEFAULT_WAIT_TIMEOUT_SECONDS;
@@ -103,7 +104,7 @@ async function runPageOperation(
 	if (result.status !== 'completed') return shapePending(result, pageUrl, itemIndex);
 
 	const binaryPropertyName =
-		withScreenshot || operation === 'pdf'
+		withScreenshot || withPdf
 			? (ctx.getNodeParameter('binaryPropertyName', itemIndex, 'data') as string)
 			: 'data';
 	return await shapeCompleted(ctx, {

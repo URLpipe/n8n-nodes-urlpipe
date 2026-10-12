@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+- **Scrape** takes **PDF** and **Extracted Data** among its operations, with the PDF Options, Fields and Instructions of Get PDF and Extract Data. The PDF goes to binary data, next to the screenshot when both are asked for.
+
 ## 0.2.0
 
 - **Get PDF**: the whole rendered page as a PDF file, with options for the paper, orientation, margins, scale, backgrounds and stylesheet.
