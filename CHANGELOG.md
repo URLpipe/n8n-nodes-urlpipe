@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2
+
+- **Scroll to Bottom** under Options scrolls the page before it is read, for as long as scrolling loads more: the whole of a listing or a feed that loads as a visitor scrolls.
+
 ## 0.2.1
 
 - **Scrape** takes **PDF** and **Extracted Data** among its operations, with the PDF Options, Fields and Instructions of Get PDF and Extract Data. The PDF goes to binary data, next to the screenshot when both are asked for.

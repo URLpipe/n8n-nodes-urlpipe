@@ -63,6 +63,7 @@ These are under **Options** on every page operation:
 - **Labels**: your own name and value pairs, such as `client: acme`. The URLpipe dashboard filters history and totals credits by them, and they come back with async results.
 - **Residential**: load the page from a residential address, for sites that serve a datacentre less than they serve a browser. Adds 25 credits per page visit.
 - **Block Ads**, **Block Cookie Banners** and **Block Popups**: take ads, consent banners and newsletter or app-install popups out of the page before it is read. Pages with ads usually load much faster.
+- **Scroll to Bottom**: scroll the page before it is read, for as long as scrolling loads more, for listings and feeds that load as a visitor scrolls.
 - **Wait for Selector**: wait up to 10 seconds for an element, for pages whose content arrives after they load.
 - **Wait for Result** and **Wait Timeout**: see below.
 - **Report To**: a webhook URL for the result, when Wait for Result is off.

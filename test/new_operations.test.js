@@ -23,7 +23,7 @@ test('Get PDF sends the PDF options and outputs the file as binary data named af
 				media: 'screen',
 				singlePage: false,
 			},
-			options: { blockPopups: true },
+			options: { blockPopups: true, scrollToBottom: true },
 		},
 		responses: [
 			{
@@ -44,7 +44,7 @@ test('Get PDF sends the PDF options and outputs the file as binary data named af
 		media: 'screen',
 		single_page: false,
 	});
-	assert.deepEqual(requests[0].options.body.page_options, { block_popups: true });
+	assert.deepEqual(requests[0].options.body.page_options, { block_popups: true, scroll_to_bottom: true });
 
 	const [item] = output;
 	assert.equal(item.binary.file.mimeType, 'application/pdf');

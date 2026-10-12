@@ -125,6 +125,15 @@ export const pageOptionsField: INodeProperties = {
 				'Whether to load the page from a residential address instead of a datacentre one, for sites that serve a datacentre less than they serve a browser. Adds 25 credits per page visit.',
 		},
 		{
+			displayName: 'Scroll to Bottom',
+			name: 'scrollToBottom',
+			type: 'boolean',
+			default: false,
+			description:
+				'Whether to scroll down the page before it is read, for as long as scrolling loads more. For listings and feeds that load their content as a visitor scrolls.',
+			displayOptions: { hide: { '/operation': ['lighthouse'] } },
+		},
+		{
 			displayName: 'Wait for Result',
 			name: 'waitForResult',
 			type: 'boolean',

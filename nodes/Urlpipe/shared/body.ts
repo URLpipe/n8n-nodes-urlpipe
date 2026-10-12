@@ -10,6 +10,7 @@ export interface PageOptions {
 	maxAge?: string | number;
 	reportTo?: string;
 	residential?: boolean;
+	scrollToBottom?: boolean;
 	waitForResult?: boolean;
 	waitForSelector?: string;
 	waitTimeout?: number;
@@ -72,6 +73,7 @@ function pageOptionsValue(options: PageOptions): IDataObject | undefined {
 	if (options.blockAds) pageOptions.block_ads = true;
 	if (options.blockCookieBanners) pageOptions.block_cookie_banners = true;
 	if (options.blockPopups) pageOptions.block_popups = true;
+	if (options.scrollToBottom) pageOptions.scroll_to_bottom = true;
 	if (options.waitForSelector && options.waitForSelector.trim()) {
 		pageOptions.wait_for_selector = options.waitForSelector.trim();
 	}
